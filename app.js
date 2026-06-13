@@ -399,3 +399,23 @@ if (inputCajero && suggestionsContainer) {
         }
     });
 }
+
+// --- LÓGICA DEL MENÚ HAMBURGUESA PARA TELÉFONOS ---
+const btnMenuMovil = document.getElementById('btn-menu-movil');
+const sidebar = document.querySelector('.sidebar');
+
+if (btnMenuMovil && sidebar) {
+    // Abrir/Cerrar menú al tocar el botón
+    btnMenuMovil.addEventListener('click', (e) => {
+        e.stopPropagation(); // Evita que el clic se propague al documento
+        sidebar.classList.toggle('abierto');
+    });
+
+    // Cerrar el menú si tocas cualquier otra parte de la pantalla
+    document.addEventListener('click', (e) => {
+        // Si el menú está abierto y el clic NO fue dentro del sidebar ni en el botón
+        if (sidebar.classList.contains('abierto') && !sidebar.contains(e.target) && e.target !== btnMenuMovil) {
+            sidebar.classList.remove('abierto');
+        }
+    });
+}

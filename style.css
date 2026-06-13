@@ -128,3 +128,60 @@ th { background: #f8f9fa; font-weight: 600; }
     color: var(--primary-color);
     font-weight: 600;
 }
+
+/* =========================================
+   ADAPTACIÓN PARA TELÉFONOS (DISEÑO MÓVIL)
+   ========================================= */
+@media screen and (max-width: 768px) {
+    /* ... (deja el resto de reglas que ya tenías para el body, tarjetas, etc.) ... */
+
+    /* Mostrar el botón hamburguesa */
+    .hamburger-btn {
+        display: block !important;
+    }
+
+    /* Ocultar el menú lateral a la izquierda por defecto */
+    .sidebar {
+        position: fixed !important;
+        top: 0;
+        left: -100% !important; /* Escondido fuera de la pantalla */
+        width: 260px !important;
+        height: 100vh !important;
+        background-color: white;
+        z-index: 9999;
+        transition: left 0.3s ease-in-out !important; /* Animación de deslizamiento */
+        box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+        border-right: none !important;
+    }
+
+    /* Esta clase se añadirá con JavaScript al tocar el botón */
+    .sidebar.abierto {
+        left: 0 !important; /* Aparece en pantalla */
+    }
+
+    /* Arreglar el header para que el botón y el título estén alineados */
+    header, .top-header {
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 15px !important;
+        height: auto !important;
+        padding: 15px !important;
+    }
+}
+
+/* --- ESTILO DEL BOTÓN HAMBURGUESA --- */
+.hamburger-btn {
+    display: none; /* Oculto en computadoras */
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    color: var(--primary-color);
+    cursor: pointer;
+    padding: 5px 10px;
+    transition: transform 0.2s;
+}
+
+.hamburger-btn:active {
+    transform: scale(0.9);
+}
