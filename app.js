@@ -18,7 +18,7 @@ const db = getFirestore(app);
 
 // GLOBALES
 let cierreSeleccionadoId = null;
-let comisionTuuActual = 0.0299; 
+let comisionTuuActual = 0.0237; 
 let datosCierresGlobales = [];
 let listaEmpleadosGlobales = [];
 let chartRevenueInstance = null;
