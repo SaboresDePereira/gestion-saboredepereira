@@ -55,9 +55,42 @@ document.getElementById('form-login').addEventListener('submit', (e) => {
 });
 document.getElementById('btn-logout').addEventListener('click', () => signOut(auth));
 
-// PANEL FINANCIERO (Cálculos avanzados: Mejor día y Variación)
+// ==========================================
+// PANEL FINANCIERO Y GRÁFICO INTERACTIVO
+// ==========================================
 document.getElementById('cfg-tuu').addEventListener('input', (e) => { comisionTuuActual = Number(e.target.value) / 100; procesarCierres(); });
-document.getElementById('filtro-tiempo-grafico').addEventListener('change', (e) => { filtroTiempoActual = e.target.value; procesarCierres(); });
+
+// Control de los nuevos botones de filtro (Esta Semana, Este Mes, Este Año)
+let periodoGraficoActual = 'semana';
+
+window.cambiarPeriodoGrafico = function(periodo) {
+    periodoGraficoActual = periodo;
+    
+    // Cambiar color de los botones
+    document.getElementById('btn-filtro-semana').classList.remove('active');
+    document.getElementById('btn-filtro-mes').classList.remove('active');
+    document.getElementById('btn-filtro-ano').classList.remove('active');
+    
+    if(periodo === 'semana') document.getElementById('btn-filtro-semana').classList.add('active');
+    if(periodo === 'mes') document.getElementById('btn-filtro-mes').classList.add('active');
+    if(periodo === 'ano') document.getElementById('btn-filtro-ano').classList.add('active');
+    
+    // Limpiar calendarios manuales
+    document.getElementById('grafico-fecha-inicio').value = "";
+    document.getElementById('grafico-fecha-fin').value = "";
+    
+    procesarCierres();
+}
+
+// Escuchar los calendarios manuales
+setTimeout(() => {
+    const inputInicio = document.getElementById('grafico-fecha-inicio');
+    const inputFin = document.getElementById('grafico-fecha-fin');
+    if(inputInicio && inputFin) {
+        inputInicio.addEventListener('change', () => { periodoGraficoActual = 'manual'; procesarCierres(); });
+        inputFin.addEventListener('change', () => { periodoGraficoActual = 'manual'; procesarCierres(); });
+    }
+}, 1000);
 
 function escucharCierres() {
     onSnapshot(query(collection(db, "cierres_caja"), orderBy("fecha", "desc")), (snapshot) => {
@@ -69,42 +102,30 @@ function escucharCierres() {
 
 function procesarCierres() {
     let totalBruto = 0; let totalNeto = 0;
-    let mapeoTemporal = {};
-    let ventasPorFecha = {}; // Para calcular el mejor día y variaciones
+    let ventasPorFecha = {}; 
     
-    // Convertir fecha de hoy y ayer a formato YYYY-MM-DD para comparar
     const tzHoy = new Date();
     const strHoy = tzHoy.toISOString().split('T')[0];
     const tzAyer = new Date(tzHoy); tzAyer.setDate(tzHoy.getDate() - 1);
     const strAyer = tzAyer.toISOString().split('T')[0];
 
+    // 1. Cálculos de las tarjetas de arriba (Totales, Variación, Mejor Día)
     datosCierresGlobales.forEach(c => {
         const totalDia = c.venta_efectivo + c.venta_tarjeta_bruta;
         const netoDia = c.venta_efectivo + (c.venta_tarjeta_bruta - (c.venta_tarjeta_bruta * comisionTuuActual));
         
         totalBruto += totalDia;
         totalNeto += netoDia;
-
-        // Agrupar por fecha exacta
         ventasPorFecha[c.fecha] = (ventasPorFecha[c.fecha] || 0) + totalDia;
-
-        // Filtros de Gráfica
-        const dObj = new Date(c.fecha + "T00:00:00");
-        if (filtroTiempoActual === 'semana') mapeoTemporal[dObj.toLocaleDateString('es-ES', {weekday:'long'})] = (mapeoTemporal[dObj.toLocaleDateString('es-ES', {weekday:'long'})] || 0) + totalDia;
-        if (filtroTiempoActual === 'mes' && dObj.getMonth() === tzHoy.getMonth()) mapeoTemporal["Día "+dObj.getDate()] = (mapeoTemporal["Día "+dObj.getDate()] || 0) + totalDia;
-        if (filtroTiempoActual === 'ano' && dObj.getFullYear() === tzHoy.getFullYear()) mapeoTemporal[dObj.toLocaleDateString('es-ES', {month:'long'})] = (mapeoTemporal[dObj.toLocaleDateString('es-ES', {month:'long'})] || 0) + totalDia;
     });
 
-    // Cálculos de KPI
     document.getElementById('kpi-ingresos').innerText = "$" + totalBruto.toLocaleString('de-DE');
     document.getElementById('kpi-neta').innerText = "$" + Math.round(totalNeto).toLocaleString('de-DE');
 
-    // Mejor Día
     let maxVenta = 0; let maxFecha = "-";
     for(const [f, v] of Object.entries(ventasPorFecha)) { if(v > maxVenta) { maxVenta = v; maxFecha = f; } }
     document.getElementById('kpi-mejor-dia').innerText = maxFecha !== "-" ? `${maxFecha} ($${maxVenta.toLocaleString('de-DE')})` : "-";
 
-    // Variación Hoy vs Ayer
     const vHoy = ventasPorFecha[strHoy] || 0;
     const vAyer = ventasPorFecha[strAyer] || 0;
     const variacionEl = document.getElementById('kpi-variacion');
@@ -116,16 +137,99 @@ function procesarCierres() {
         variacionEl.style.color = pct >= 0 ? "green" : "red";
     }
 
-    renderizarGrafica(filtroTiempoActual === 'semana' ? ['lunes','martes','miércoles','jueves','viernes','sábado','domingo'].map(d=>mapeoTemporal[d]||0) : Object.values(mapeoTemporal), 
-                      filtroTiempoActual === 'semana' ? ['lunes','martes','miércoles','jueves','viernes','sábado','domingo'] : Object.keys(mapeoTemporal));
+    // 2. Lógica Estricta de Tiempo para el Gráfico
+    let cierresOrdenados = [...datosCierresGlobales].sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+    let fechaInicioFiltro, fechaFinFiltro;
+    
+    if (periodoGraficoActual === 'semana') {
+        const diaSemana = tzHoy.getDay();
+        const diferenciaLunes = tzHoy.getDate() - diaSemana + (diaSemana === 0 ? -6 : 1);
+        fechaInicioFiltro = new Date(new Date(tzHoy).setDate(diferenciaLunes));
+        fechaInicioFiltro.setHours(0,0,0,0);
+        fechaFinFiltro = new Date(fechaInicioFiltro);
+        fechaFinFiltro.setDate(fechaInicioFiltro.getDate() + 6);
+        fechaFinFiltro.setHours(23,59,59,999);
+    } else if (periodoGraficoActual === 'mes') {
+        fechaInicioFiltro = new Date(tzHoy.getFullYear(), tzHoy.getMonth(), 1, 0, 0, 0);
+        fechaFinFiltro = new Date(tzHoy.getFullYear(), tzHoy.getMonth() + 1, 0, 23, 59, 59);
+    } else if (periodoGraficoActual === 'ano') {
+        fechaInicioFiltro = new Date(tzHoy.getFullYear(), 0, 1, 0, 0, 0);
+        fechaFinFiltro = new Date(tzHoy.getFullYear(), 11, 31, 23, 59, 59);
+    } else if (periodoGraficoActual === 'manual') {
+        const ini = document.getElementById('grafico-fecha-inicio').value;
+        const fin = document.getElementById('grafico-fecha-fin').value;
+        fechaInicioFiltro = ini ? new Date(ini + "T00:00:00") : new Date(0);
+        fechaFinFiltro = fin ? new Date(fin + "T23:59:59") : new Date();
+    }
+
+    let datosFiltrados = cierresOrdenados.filter(c => {
+        const fCierre = new Date(c.fecha + "T00:00:00");
+        return fCierre >= fechaInicioFiltro && fCierre <= fechaFinFiltro;
+    });
+
+    let labels = [];
+    let valoresEfectivo = [];
+    let valoresTarjeta = [];
+
+    // 3. Preparar los datos visuales
+    if (periodoGraficoActual === 'semana') {
+        labels = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+        valoresEfectivo = [0, 0, 0, 0, 0, 0, 0];
+        valoresTarjeta = [0, 0, 0, 0, 0, 0, 0];
+        const mapaDias = { 1: 0, 2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 0: 6 };
+
+        datosFiltrados.forEach(c => {
+            const fCierre = new Date(c.fecha + "T00:00:00");
+            const indiceDia = mapaDias[fCierre.getDay()];
+            if (indiceDia !== undefined) {
+                valoresEfectivo[indiceDia] = c.venta_efectivo;
+                valoresTarjeta[indiceDia] = c.venta_tarjeta_bruta;
+            }
+        });
+    } else {
+        datosFiltrados.forEach(c => {
+            const f = new Date(c.fecha + "T00:00:00");
+            labels.push(f.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }));
+            valoresEfectivo.push(c.venta_efectivo);
+            valoresTarjeta.push(c.venta_tarjeta_bruta);
+        });
+    }
+
+    renderizarGrafica(valoresEfectivo, valoresTarjeta, labels, datosFiltrados);
     renderizarTablaCierres();
 }
 
-function renderizarGrafica(datos, labels) {
+function renderizarGrafica(datosEfectivo, datosTarjeta, labels, datosFiltrados) {
+    const ctx = document.getElementById('revenueChart');
+    if(!ctx) return;
+
     if(chartRevenueInstance) chartRevenueInstance.destroy();
-    chartRevenueInstance = new Chart(document.getElementById('revenueChart').getContext('2d'), {
-        type: 'line', data: { labels: labels, datasets: [{ label: 'Ingresos Brutos ($)', data: datos, borderColor: '#e63946', tension: 0.3, fill: true, backgroundColor:'rgba(230,57,70,0.1)' }] },
-        options: { responsive: true, maintainAspectRatio: false }
+    
+    chartRevenueInstance = new Chart(ctx.getContext('2d'), {
+        type: 'bar', // Cambiado a barras para que diferencie efectivo de tarjeta
+        data: { 
+            labels: labels, 
+            datasets: [
+                { label: 'Efectivo', data: datosEfectivo, backgroundColor: '#1d3557', borderRadius: 4 },
+                { label: 'Tarjetas (Bruto)', data: datosTarjeta, backgroundColor: '#e63946', borderRadius: 4 }
+            ] 
+        },
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false,
+            scales: {
+                x: { stacked: true },
+                y: { stacked: true, ticks: { callback: value => '$' + value.toLocaleString('de-DE') } }
+            },
+            onClick: (e, elementos) => {
+                // Al hacer clic te envía al historial
+                if (elementos.length > 0) {
+                    if (typeof window.showSection === 'function') window.showSection('cierre-caja');
+                    else showSection('cierre-caja');
+                    setTimeout(() => { document.getElementById('tabla-cierres').scrollIntoView({ behavior: 'smooth' }); }, 150);
+                }
+            }
+        }
     });
 }
 

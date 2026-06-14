@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,14 +10,19 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
     <div id="login-screen" class="screen active">
         <div class="login-wrapper">
-            <div class="login-brand"><i class="fa-solid fa-burger"></i><h2>Sabores De Pereira</h2></div>
+            <div class="login-brand"><i class="fa-solid fa-burger"></i>
+                <h2>Sabores De Pereira</h2>
+            </div>
             <form id="form-login">
-                <div class="input-group"><i class="fa-solid fa-envelope"></i><input type="email" id="email" placeholder="Correo corporativo" required></div>
-                <div class="input-group"><i class="fa-solid fa-lock"></i><input type="password" id="password" placeholder="Contraseña" required></div>
+                <div class="input-group"><i class="fa-solid fa-envelope"></i><input type="email" id="email"
+                        placeholder="Correo corporativo" required></div>
+                <div class="input-group"><i class="fa-solid fa-lock"></i><input type="password" id="password"
+                        placeholder="Contraseña" required></div>
                 <button type="submit" id="btn-login" class="btn-primary">Acceder al Sistema</button>
                 <button type="button" id="btn-reset" class="btn-text">¿Olvidaste tu contraseña?</button>
                 <p id="login-error" class="error-msg"></p>
@@ -28,55 +34,91 @@
         <aside class="sidebar">
             <div class="sidebar-header"><i class="fa-solid fa-utensils"></i><span>Sabores Admin</span></div>
 
-</button>
+            </button>
             <ul class="nav-links">
-                <li><button onclick="showSection('panel-principal')" class="active-nav"><i class="fa-solid fa-chart-pie"></i> Panel Financiero</button></li>
-                <li><button onclick="showSection('cierre-caja')"><i class="fa-solid fa-cash-register"></i> Cierre de Caja (Z)</button></li>
-                <li><button onclick="showSection('inventario')"><i class="fa-solid fa-boxes-stacked"></i> Compras e Insumos</button></li>
-                <li><button onclick="showSection('gastos-fijos')"><i class="fa-solid fa-file-invoice-dollar"></i> Gastos Fijos</button></li>
-                <li><button onclick="showSection('personal')"><i class="fa-solid fa-users-gear"></i> Personal</button></li>
+                <li><button onclick="showSection('panel-principal')" class="active-nav"><i
+                            class="fa-solid fa-chart-pie"></i> Panel Financiero</button></li>
+                <li><button onclick="showSection('cierre-caja')"><i class="fa-solid fa-cash-register"></i> Cierre de
+                        Caja (Z)</button></li>
+                <li><button onclick="showSection('inventario')"><i class="fa-solid fa-boxes-stacked"></i> Compras e
+                        Insumos</button></li>
+                <li><button onclick="showSection('gastos-fijos')"><i class="fa-solid fa-file-invoice-dollar"></i> Gastos
+                        Fijos</button></li>
+                <li><button onclick="showSection('personal')"><i class="fa-solid fa-users-gear"></i> Personal</button>
+                </li>
             </ul>
-            <div class="sidebar-footer"><button id="btn-logout" class="btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar Sesión</button></div>
+            <div class="sidebar-footer"><button id="btn-logout" class="btn-logout"><i
+                        class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar Sesión</button></div>
         </aside>
 
         <main class="main-content">
             <header class="topbar">
-                <div class="topbar-title"><h2 id="section-title">Panel Financiero</h2></div>
-                <div class="user-profile"><span id="user-email-display">cargando...</span><div class="avatar"><i class="fa-solid fa-user-tie"></i></div></div>
+                <div class="topbar-title">
+                    <h2 id="section-title">Panel Financiero</h2>
+                </div>
+                <div class="user-profile"><span id="user-email-display">cargando...</span>
+                    <div class="avatar"><i class="fa-solid fa-user-tie"></i></div>
+                </div>
                 <button id="btn-menu-movil" class="hamburger-btn"><i class="fa-solid fa-bars"></i>
-</button>
+                </button>
             </header>
 
             <div class="content-wrapper">
-                
+
                 <section id="panel-principal" class="content-section">
                     <div class="config-bar">
                         <label><i class="fa-solid fa-percent"></i> Comisión Tuu:</label>
-                        <input type="number" id="cfg-tuu" value="2.37" step="0.01" style="width: 80px; margin-right: 20px;"> %
+                        <input type="number" id="cfg-tuu" value="2.37" step="0.01"
+                            style="width: 80px; margin-right: 20px;"> %
                         <label><i class="fa-solid fa-calendar-days"></i> Ver Gráfico por:</label>
-                        <select id="filtro-tiempo-grafico" class="modern-select">
-                            <option value="semana">Esta Semana</option>
-                            <option value="mes">Este Mes</option>
-                            <option value="ano">Este Año</option>
-                        </select>
+                        <div class="filters" style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+                            <button id="btn-filtro-semana" class="btn-secondary active"
+                                onclick="cambiarPeriodoGrafico('semana')">Esta Semana</button>
+                            <button id="btn-filtro-mes" class="btn-secondary"
+                                onclick="cambiarPeriodoGrafico('mes')">Este Mes</button>
+                            <button id="btn-filtro-ano" class="btn-secondary"
+                                onclick="cambiarPeriodoGrafico('ano')">Este Año</button>
+
+                            <div style="display: flex; align-items: center; gap: 5px; margin-left: 10px;"
+                                class="inputs-fecha-grafico">
+                                <label style="font-size: 12px; color: var(--text-muted);">Desde:</label>
+                                <input type="date" id="grafico-fecha-inicio"
+                                    style="padding: 5px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 12px;">
+                                <label style="font-size: 12px; color: var(--text-muted);">Hasta:</label>
+                                <input type="date" id="grafico-fecha-fin"
+                                    style="padding: 5px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 12px;">
+                            </div>
+                        </div>
                     </div>
 
                     <div class="kpi-grid">
                         <div class="kpi-card">
                             <div class="kpi-icon bg-blue"><i class="fa-solid fa-money-bill-wave"></i></div>
-                            <div class="kpi-data"><h3>Ingresos Brutos</h3><p id="kpi-ingresos">$0</p></div>
+                            <div class="kpi-data">
+                                <h3>Ingresos Brutos</h3>
+                                <p id="kpi-ingresos">$0</p>
+                            </div>
                         </div>
                         <div class="kpi-card">
                             <div class="kpi-icon bg-green"><i class="fa-solid fa-piggy-bank"></i></div>
-                            <div class="kpi-data"><h3>Ingreso Neto</h3><p id="kpi-neta">$0</p></div>
+                            <div class="kpi-data">
+                                <h3>Ingreso Neto</h3>
+                                <p id="kpi-neta">$0</p>
+                            </div>
                         </div>
                         <div class="kpi-card">
                             <div class="kpi-icon bg-purple"><i class="fa-solid fa-arrow-trend-up"></i></div>
-                            <div class="kpi-data"><h3>Hoy vs Ayer</h3><p id="kpi-variacion">0%</p></div>
+                            <div class="kpi-data">
+                                <h3>Hoy vs Ayer</h3>
+                                <p id="kpi-variacion">0%</p>
+                            </div>
                         </div>
                         <div class="kpi-card">
                             <div class="kpi-icon bg-orange"><i class="fa-solid fa-trophy"></i></div>
-                            <div class="kpi-data"><h3>Mejor Día</h3><p id="kpi-mejor-dia">-</p></div>
+                            <div class="kpi-data">
+                                <h3>Mejor Día</h3>
+                                <p id="kpi-mejor-dia">-</p>
+                            </div>
                         </div>
                     </div>
                     <div class="chart-container fixed-height-chart">
@@ -89,14 +131,21 @@
                         <h3><i class="fa-solid fa-calculator"></i> Registrar Cierre Diario</h3>
                         <form id="form-z" class="modern-form">
                             <div class="form-row">
-                                <div class="form-group"><label>Fecha</label><input type="date" id="z-fecha" required></div>
-                                <div class="form-group dropdown-container"><label>Responsable</label><input type="text" id="z-cajero" autocomplete="off" required><div id="z-cajero-suggestions" class="autocomplete-suggestions"></div></div>
+                                <div class="form-group"><label>Fecha</label><input type="date" id="z-fecha" required>
+                                </div>
+                                <div class="form-group dropdown-container"><label>Responsable</label><input type="text"
+                                        id="z-cajero" autocomplete="off" required>
+                                    <div id="z-cajero-suggestions" class="autocomplete-suggestions"></div>
+                                </div>
                             </div>
                             <div class="form-row">
-                                <div class="form-group"><label>Total Efectivo ($)</label><input type="text" id="z-efectivo" class="currency-input" required></div>
-                                <div class="form-group"><label>Total Tarjetas / Transferencias ($)</label><input type="text" id="z-tarjeta" class="currency-input" required></div>
+                                <div class="form-group"><label>Total Efectivo ($)</label><input type="text"
+                                        id="z-efectivo" class="currency-input" required></div>
+                                <div class="form-group"><label>Total Tarjetas / Transferencias ($)</label><input
+                                        type="text" id="z-tarjeta" class="currency-input" required></div>
                             </div>
-                            <div class="form-group"><label>Notas / Observaciones</label><input type="text" id="z-desc"></div>
+                            <div class="form-group"><label>Notas / Observaciones</label><input type="text" id="z-desc">
+                            </div>
                             <button type="submit" id="btn-procesar-z" class="btn-primary">Procesar Cierre</button>
                         </form>
                         <div id="z-mensaje" class="status-msg"></div>
@@ -105,11 +154,25 @@
                     <div class="table-panel mt-20">
                         <div class="table-header-tools">
                             <h3>Historial de Cierres</h3>
-                            <div class="tools-filters"><input type="text" id="search-z" placeholder="Buscar por cajero..."><select id="sort-z"><option value="fecha-desc">Recientes</option><option value="fecha-asc">Antiguos</option></select></div>
+                            <div class="tools-filters"><input type="text" id="search-z"
+                                    placeholder="Buscar por cajero..."><select id="sort-z">
+                                    <option value="fecha-desc">Recientes</option>
+                                    <option value="fecha-asc">Antiguos</option>
+                                </select></div>
                         </div>
                         <div class="responsive-table">
                             <table id="tabla-cierres" class="clickable-table">
-                                <thead><tr><th>Fecha</th><th>Cajero</th><th>Efectivo</th><th>Tarjetas</th><th>Total Bruto</th><th>Neto Diario</th><th>Notas</th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Cajero</th>
+                                        <th>Efectivo</th>
+                                        <th>Tarjetas</th>
+                                        <th>Total Bruto</th>
+                                        <th>Neto Diario</th>
+                                        <th>Notas</th>
+                                    </tr>
+                                </thead>
                                 <tbody></tbody>
                             </table>
                         </div>
@@ -121,13 +184,18 @@
                         <div class="form-panel">
                             <h3><i class="fa-solid fa-cart-shopping"></i> Registrar Compra</h3>
                             <form id="form-compra" class="modern-form">
-                                <div class="form-group"><label>Insumo</label><input type="text" id="compra-insumo" required></div>
+                                <div class="form-group"><label>Insumo</label><input type="text" id="compra-insumo"
+                                        required></div>
                                 <div class="form-row">
-                                    <div class="form-group"><label>Cantidad</label><input type="number" id="compra-cantidad" required></div>
-                                    <div class="form-group"><label>Costo Total ($)</label><input type="text" id="compra-costo" class="currency-input" required></div>
+                                    <div class="form-group"><label>Cantidad</label><input type="number"
+                                            id="compra-cantidad" required></div>
+                                    <div class="form-group"><label>Costo Total ($)</label><input type="text"
+                                            id="compra-costo" class="currency-input" required></div>
                                 </div>
-                                <div class="form-group"><label>Descripción / Marca</label><input type="text" id="compra-desc"></div>
-                                <div class="form-group"><label>Fecha</label><input type="date" id="compra-fecha" required></div>
+                                <div class="form-group"><label>Descripción / Marca</label><input type="text"
+                                        id="compra-desc"></div>
+                                <div class="form-group"><label>Fecha</label><input type="date" id="compra-fecha"
+                                        required></div>
                                 <button type="submit" class="btn-primary">Registrar Compra</button>
                             </form>
                         </div>
@@ -136,7 +204,7 @@
                             <canvas id="chartInsumos"></canvas>
                         </div>
                     </div>
-                    
+
                     <div class="table-panel mt-20">
                         <div class="table-header-tools">
                             <h3>Historial de Compras</h3>
@@ -144,7 +212,15 @@
                         </div>
                         <div class="responsive-table">
                             <table id="tabla-compras">
-                                <thead><tr><th>Fecha</th><th>Insumo</th><th>Cantidad</th><th>Costo</th><th>Detalles</th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Insumo</th>
+                                        <th>Cantidad</th>
+                                        <th>Costo</th>
+                                        <th>Detalles</th>
+                                    </tr>
+                                </thead>
                                 <tbody></tbody>
                             </table>
                         </div>
@@ -165,20 +241,34 @@
                                         <option value="Gas">Gas</option>
                                         <option value="Otros">Otros (Especificar)</option>
                                     </select>
-                                    <input type="text" id="gasto-otro" class="hidden" placeholder="¿Qué gasto fue?" style="margin-top:10px;">
+                                    <input type="text" id="gasto-otro" class="hidden" placeholder="¿Qué gasto fue?"
+                                        style="margin-top:10px;">
                                 </div>
-                                <div class="form-group"><label>Monto ($)</label><input type="text" id="gasto-monto" class="currency-input" required></div>
+                                <div class="form-group"><label>Monto ($)</label><input type="text" id="gasto-monto"
+                                        class="currency-input" required></div>
                             </div>
                             <div class="form-row">
-                                <div class="form-group"><label>Fecha</label><input type="date" id="gasto-fecha" required></div>
-                                <div class="form-group"><label>Descripción Breve</label><input type="text" id="gasto-desc"></div>
+                                <div class="form-group"><label>Fecha</label><input type="date" id="gasto-fecha"
+                                        required></div>
+                                <div class="form-group"><label>Descripción Breve</label><input type="text"
+                                        id="gasto-desc"></div>
                             </div>
                             <button type="submit" class="btn-primary">Guardar Egreso</button>
                         </form>
                     </div>
                     <div class="table-panel mt-20">
                         <h3>Historial de Egresos</h3>
-                        <table id="tabla-gastos"><thead><tr><th>Fecha</th><th>Concepto</th><th>Descripción</th><th>Monto</th></tr></thead><tbody></tbody></table>
+                        <table id="tabla-gastos">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Concepto</th>
+                                    <th>Descripción</th>
+                                    <th>Monto</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
                     </div>
                 </section>
 
@@ -187,16 +277,25 @@
                         <div class="form-panel">
                             <h3><i class="fa-solid fa-user-plus"></i> Ingresar Empleado</h3>
                             <form id="form-empleado" class="modern-form">
-                                <div class="form-group"><label>Nombre Completo</label><input type="text" id="emp-nombre" required></div>
-                                <div class="form-group"><label>RUT</label><input type="text" id="emp-rut" placeholder="Ej: 12.345.678-9" required></div>
-                                <div class="form-group"><label>Pago por Día Trabajado ($)</label><input type="text" id="emp-tarifa" class="currency-input" required></div>
+                                <div class="form-group"><label>Nombre Completo</label><input type="text" id="emp-nombre"
+                                        required></div>
+                                <div class="form-group"><label>RUT</label><input type="text" id="emp-rut"
+                                        placeholder="Ej: 12.345.678-9" required></div>
+                                <div class="form-group"><label>Pago por Día Trabajado ($)</label><input type="text"
+                                        id="emp-tarifa" class="currency-input" required></div>
                                 <button type="submit" class="btn-primary">Registrar Trabajador</button>
                             </form>
                         </div>
                         <div class="table-panel">
                             <h3><i class="fa-solid fa-users"></i> Plantilla Activa (Clic para Asistencia)</h3>
                             <table id="tabla-personal" class="clickable-table">
-                                <thead><tr><th>Nombre</th><th>RUT</th><th>Tarifa Diaria</th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>RUT</th>
+                                        <th>Tarifa Diaria</th>
+                                    </tr>
+                                </thead>
                                 <tbody></tbody>
                             </table>
                         </div>
@@ -211,21 +310,26 @@
         <div class="modal-content">
             <span class="close-btn" onclick="cerrarModal('modal-z')">&times;</span>
             <h2>Detalle del Turno</h2>
-            
+
             <div id="modal-z-body" class="modal-body"></div>
-            
+
             <div id="modal-z-actions" style="display: flex; gap: 10px; margin-top: 20px;">
-                <button id="btn-editar-z" class="btn-primary" style="background-color: #0d6efd;"><i class="fa-solid fa-pen"></i> Editar</button>
-                <button id="btn-eliminar-z" class="btn-primary" style="background-color: #dc3545;"><i class="fa-solid fa-trash"></i> Eliminar</button>
+                <button id="btn-editar-z" class="btn-primary" style="background-color: #0d6efd;"><i
+                        class="fa-solid fa-pen"></i> Editar</button>
+                <button id="btn-eliminar-z" class="btn-primary" style="background-color: #dc3545;"><i
+                        class="fa-solid fa-trash"></i> Eliminar</button>
             </div>
 
             <form id="form-editar-z" class="modern-form hidden" style="margin-top: 15px;">
-                <div class="form-group"><label>Corregir Efectivo ($)</label><input type="text" id="edit-z-efectivo" class="currency-input" required></div>
-                <div class="form-group"><label>Corregir Tarjetas ($)</label><input type="text" id="edit-z-tarjeta" class="currency-input" required></div>
+                <div class="form-group"><label>Corregir Efectivo ($)</label><input type="text" id="edit-z-efectivo"
+                        class="currency-input" required></div>
+                <div class="form-group"><label>Corregir Tarjetas ($)</label><input type="text" id="edit-z-tarjeta"
+                        class="currency-input" required></div>
                 <div class="form-group"><label>Corregir Notas</label><input type="text" id="edit-z-desc"></div>
                 <div style="display: flex; gap: 10px; margin-top: 15px;">
                     <button type="submit" class="btn-primary bg-green"><i class="fa-solid fa-save"></i> Guardar</button>
-                    <button type="button" class="btn-primary" style="background-color: #6c757d;" onclick="cancelarEdicionZ()">Cancelar</button>
+                    <button type="button" class="btn-primary" style="background-color: #6c757d;"
+                        onclick="cancelarEdicionZ()">Cancelar</button>
                 </div>
             </form>
         </div>
@@ -235,28 +339,37 @@
         <div class="modal-content">
             <span class="close-btn" onclick="cerrarModal('modal-emp')">&times;</span>
             <h2 id="modal-emp-nombre">Nombre Empleado</h2>
-            <p><strong>RUT:</strong> <span id="modal-emp-rut"></span> | <strong>Pago Diario:</strong> $<span id="modal-emp-tarifa"></span></p>
+            <p><strong>RUT:</strong> <span id="modal-emp-rut"></span> | <strong>Pago Diario:</strong> $<span
+                    id="modal-emp-tarifa"></span></p>
             <hr style="margin:15px 0;">
-            <button id="btn-marcar-asistencia" class="btn-primary bg-green"><i class="fa-solid fa-calendar-check"></i> Marcar Asistencia HOY</button>
+            <button id="btn-marcar-asistencia" class="btn-primary bg-green"><i class="fa-solid fa-calendar-check"></i>
+                Marcar Asistencia HOY</button>
             <div class="table-panel mt-20">
                 <h3>Días Trabajados</h3>
                 <table id="tabla-asistencias">
-                    <thead><tr><th>Fecha</th><th>Estado</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
                     <tbody></tbody>
                 </table>
-                <h3 style="margin-top:15px; text-align:right; color:var(--primary-color);">Total a Pagar Acumulado: $<span id="modal-emp-total">0</span></h3>
+                <h3 style="margin-top:15px; text-align:right; color:var(--primary-color);">Total a Pagar Acumulado:
+                    $<span id="modal-emp-total">0</span></h3>
             </div>
         </div>
     </div>
 
     <script type="module" src="app.js"></script>
     <script>
+        window.showSection = showSection; // <-- AGREGA ESTA LÍNEA AQUÍ
         function showSection(sectionId) {
             document.querySelectorAll('.nav-links button').forEach(btn => btn.classList.remove('active-nav'));
             const clickedBtn = [...document.querySelectorAll('.nav-links button')].find(btn => btn.getAttribute('onclick').includes(sectionId));
-            if(clickedBtn) clickedBtn.classList.add('active-nav');
-            
-            const titles = {'panel-principal': 'Panel Financiero', 'cierre-caja': 'Cierre de Caja (Z)', 'inventario': 'Compras e Insumos', 'gastos-fijos': 'Gastos Fijos', 'personal': 'Control de Personal'};
+            if (clickedBtn) clickedBtn.classList.add('active-nav');
+
+            const titles = { 'panel-principal': 'Panel Financiero', 'cierre-caja': 'Cierre de Caja (Z)', 'inventario': 'Compras e Insumos', 'gastos-fijos': 'Gastos Fijos', 'personal': 'Control de Personal' };
             document.getElementById('section-title').innerText = titles[sectionId] || 'Gestión';
 
             document.querySelectorAll('.content-section').forEach(sec => sec.classList.add('hidden'));
@@ -266,4 +379,5 @@
         function cerrarModal(id) { document.getElementById(id).classList.add('hidden'); }
     </script>
 </body>
+
 </html>

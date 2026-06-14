@@ -168,6 +168,19 @@ th { background: #f8f9fa; font-weight: 600; }
         height: auto !important;
         padding: 15px !important;
     }
+
+    @media screen and (max-width: 768px) {
+    .inputs-fecha-grafico {
+        margin-left: 0 !important;
+        width: 100% !important;
+        justify-content: space-between;
+        margin-top: 5px;
+    }
+    .inputs-fecha-grafico input {
+        flex: 1;
+        max-width: 120px;
+    }
+}
 }
 
 /* --- ESTILO DEL BOTÓN HAMBURGUESA --- */
